@@ -8,32 +8,32 @@ var mySqlClient = mysql.createConnection({
   database : "shimstar"
 });
 
-var selectQuery = 'SELECT * FROM star001_user';
+//~ var selectQuery = 'SELECT * FROM star001_user';
  
-mySqlClient.query(
-  selectQuery,
-  function select(error, results, fields) {
-    if (error) {
-      console.log(error);
-      mySqlClient.end();
-      return;
-    }
+//~ mySqlClient.query(
+  //~ selectQuery,
+  //~ function select(error, results, fields) {
+    //~ if (error) {
+      //~ console.log(error);
+      //~ mySqlClient.end();
+      //~ return;
+    //~ }
  
-    if ( results.length > 0 )  { 
+    //~ if ( results.length > 0 )  { 
 		 
-		for(var i=0;i<results.length;i++){
-      var firstResult = results[ i ];
+		//~ for(var i=0;i<results.length;i++){
+      //~ var firstResult = results[ i ];
 			
-      console.log('id: ' + firstResult['star001_id']);
-      console.log('label: ' + firstResult['star001_name']);
+      //~ console.log('id: ' + firstResult['star001_id']);
+      //~ console.log('label: ' + firstResult['star001_name']);
       //~ console.log('valeur: ' + firstResult['valeur']);
-		}
-    } else {
-      console.log("Pas de données");
-    }
-    mySqlClient.end();
-  }
-);
+		//~ }
+    //~ } else {
+      //~ console.log("Pas de données");
+    //~ }
+    //~ mySqlClient.end();
+  //~ }
+//~ );
 // Keep track of the chat clients
 var clients = [];
 
@@ -47,12 +47,20 @@ net.createServer(function (socket) {
   clients.push(socket);
 
   // Send a nice welcome message and announce
-  socket.write("Welcome " + socket.name + "\n");
+  //~ socket.write("Welcome " + socket.name + "\n");
   broadcast(socket.name + " joined the chat\n", socket);
 
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
-    broadcast(socket.name + "> " + data, socket);
+    //broadcast(socket.name + "> " + data, socket);
+	  try{
+		var val = JSON.parse(data);
+		if (val.code == "1"){
+			login(socket,val);
+		}
+	  }catch(err){
+			console.log("data received not in JSON format : "  + data  + "/////" + err);
+	  }
   });
 	socket.on('error',function(){
 		console.log('socket reset');
@@ -60,10 +68,31 @@ net.createServer(function (socket) {
 	});
   // Remove the client from the list when it leaves
   socket.on('end', function () {
-	  console.log("ENNNNNNDDDD");
     clients.splice(clients.indexOf(socket), 1);
     broadcast(socket.name + " left the chat.\n");
   });
+  
+  function login(sender,jsonObj){
+	  //~ console.log(jsonObj);
+	  var selectQuery = "SELECT * FROM star001_user where star001_name ='" + jsonObj.login + "' and star001_passwd = '" + jsonObj.password +"'";
+	   var status=0;
+		var sqlQuery = mySqlClient.query(selectQuery);
+		sqlQuery.on("result", function(row) {
+
+		  status=1;
+		});
+		 
+		sqlQuery.on("end", function() {
+		  mySqlClient.end();
+		  sender.write('{"code":"1","status":"' + status + '"}');
+		});
+		 
+		sqlQuery.on("error", function(error) {
+		  console.log(error);
+			sender.write('{"code":"1","status":"-1"}');
+		});
+
+  }
   
   // Send a message to all clients
   function broadcast(message, sender) {
