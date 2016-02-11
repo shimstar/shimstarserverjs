@@ -83,7 +83,9 @@ net.createServer(function (socket) {
 		});
 		 
 		sqlQuery.on("end", function() {
-		  mySqlClient.end();
+			//~ if (status){
+		  //~ mySqlClient.end();
+			//~ }
 		  sender.write('{"code":"1","status":"' + status + '"}');
 		});
 		 
