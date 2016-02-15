@@ -8,32 +8,6 @@ var mySqlClient = mysql.createConnection({
   database : "shimstar"
 });
 
-//~ var selectQuery = 'SELECT * FROM star001_user';
- 
-//~ mySqlClient.query(
-  //~ selectQuery,
-  //~ function select(error, results, fields) {
-    //~ if (error) {
-      //~ console.log(error);
-      //~ mySqlClient.end();
-      //~ return;
-    //~ }
- 
-    //~ if ( results.length > 0 )  { 
-		 
-		//~ for(var i=0;i<results.length;i++){
-      //~ var firstResult = results[ i ];
-			
-      //~ console.log('id: ' + firstResult['star001_id']);
-      //~ console.log('label: ' + firstResult['star001_name']);
-      //~ console.log('valeur: ' + firstResult['valeur']);
-		//~ }
-    //~ } else {
-      //~ console.log("Pas de données");
-    //~ }
-    //~ mySqlClient.end();
-  //~ }
-//~ );
 // Keep track of the chat clients
 var clients = [];
 
