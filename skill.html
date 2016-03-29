@@ -1,0 +1,108 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script>
+
+ function loadJSON(callback) {   
+    var xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+    xobj.open('GET', 'skillshim.json', true); // Replace 'my_data' with the path to your file
+    xobj.onreadystatechange = function () {
+          if (xobj.readyState == 4 && xobj.status == "200") {
+            // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+            callback(xobj.responseText);
+          }
+    };
+    xobj.send(null);  
+ }
+ 
+ function drawNode(lastPosT,lastPosL,node, degrees,lvl){
+				var decal=64;
+				var img="images/Blue4.png";
+				var size="128px";
+				var loin=250;
+				var tt=40;
+				if (lvl>1){
+					decal=32;
+					img="images/Blue3.png";
+					size="64px";
+					loin=150;
+					tt=20;
+				}
+				var post = lastPosT+decal - loin*Math.cos(degrees);
+				var posl = lastPosL+decal - loin*Math.sin(degrees);
+				var board=document.getElementById("board");
+				
+				var $div = $("<div>", {id: node.name, style: "position:absolute;top:" + post + ";left:" + posl});
+				var myImage = $('<img/>',{src : img, width:size, height:size});
+				$div.append(myImage);
+				$("#board").append($div);
+				$div = $("<div>", {id: node.name, style: "position:absolute;top:" + (post +tt) + ";left:" + (posl + 0)});
+				$div.text(node.name);
+				$("#board").append($div);
+				if (node.nodes){
+					var ll=lvl+1;
+					var deg=degrees;
+					for(var i=0;i<node.nodes.length;i++){
+						drawNode(post,posl,node.nodes[i],deg,ll);
+						deg+=45;
+					}
+				}
+				var c=document.getElementById("myCanvas");
+				var ctx=c.getContext("2d");
+				ctx.beginPath();
+				ctx.moveTo(posl+decal,post+decal);
+				ctx.lineTo(lastPosL,lastPosT);
+				ctx.stroke();
+ }
+ 
+ 
+ //~ var post = postop+32 - 150*Math.cos(degrees);
+				//~ var posl = posleft+32 - 150*Math.sin(degrees);
+				//~ var board=document.getElementById("board");
+				//~ var $div = $("<div>", {id: nodes1[j].name, style: "position:absolute;top:" + post + ";left:" + posl});
+				//~ var myImage = $('<img/>',{src : "images/Blue4.png", width:"64px", height:"64px"});
+				//~ $div.append(myImage);
+				//~ $("#board").append($div);
+				//~ $div = $("<div>", {id: nodes1[0].name, style: "position:absolute;top:" + (post +20) + ";left:" + (posl + 0)});
+				//~ $div.text(nodes1[j].name);
+				//~ $("#board").append($div);
+				//~ degrees+=45;
+function init() {
+ loadJSON(function(response) {
+  console.log(response);
+    var skilljson= JSON.parse(response);
+	 var postop = 2000;
+	 var posleft= 2000;
+	 for(var i=0;i<skilljson.primaries.length;i++){
+		if(skilljson.primaries[i].name == "militaire"){
+			var nodes1 = skilljson.primaries[i].nodes;
+			var degrees = 0;
+			for (var j=0;j<nodes1.length;j++){
+				drawNode(postop,posleft,nodes1[j],degrees,1);
+				degrees+=45;
+			}
+		}
+	 }
+	 
+ });
+}
+
+init();
+
+</script>
+</head>
+<body>
+	
+	<div id="board">
+	<canvas id="myCanvas" width="10000px" height="10000px" style="border:1px solid #d3d3d3;">
+	Your browser does not support the HTML5 canvas tag.</canvas>
+	<div id ="center" style="position:absolute;top:2000px;left:2000px;">
+	<img src="images/Pink2.png">
+	</div>
+	<div id ="center" style="position:absolute;top:2040px;left:2040px;">
+	<p>Militaire</p>
+	</div>
+	</div>
+</body>
+</html>

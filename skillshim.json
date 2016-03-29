@@ -1,0 +1,78 @@
+{
+	"primaries":[
+		{
+			"name":	"militaire",
+			"type" : "major",
+			"nodes":
+			[
+				{
+					"name":"pilotage",
+					"type" : "intermediate",
+					"nodes":
+					[
+						{
+							"name":"chasseur leger",
+							"type" : "player",
+							"nodes":[
+								{
+									"name":"vitesse",
+									"type" : "minor",
+									"nodes":
+									[
+										{"name":"acceleration +3%","type" : "player"},
+										{"name":"vitesse +3%","type" : "player"}
+									]
+								},
+								{
+									"name":"evitement",
+									"type" : "minor",
+									"nodes":
+									[
+										{"name":"evitement +3% degat / +3% chance","type" : "player"},
+										{"name":"evitement +3% degat","type" : "player"}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name":"electronique",
+					"type" : "intermediate",
+					"nodes":[
+						{
+							"name":"bouclier",
+							"type" : "minor",
+							"nodes":[
+								{
+									"name":"absorption +3%","type" : "player"
+								},
+								{
+									"name":"taux de regen +3%","type" : "player"
+								}
+							]
+							
+						},
+						{
+							"name":"radar",
+							"type" : "minor",
+							"nodes":[
+								{"name":"radar plat avant","type" : "player"},
+								{"name":"radar plat arriere","player"}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name":	"economie",
+			"type" : "major"
+		},
+		{
+			"name":	"politique",
+			"type" : "major"
+		}
+		
+	]
+}
