@@ -23,8 +23,19 @@
 				var loin=250;
 				var tt=40;
 				if (lvl>1){
+					if (node.type=="intermediate"){	
+						img="images/Blue1.png";
+					}else{
+						if (node.type=="minor"){
+						img="images/Blue2.png";
+						}else{
+							if (node.type=="player"){
+							img="images/Green2.png";
+							}
+						}
+					}
 					decal=32;
-					img="images/Blue3.png";
+					//img="images/Green2.png"
 					size="64px";
 					loin=150;
 					tt=20;

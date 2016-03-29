@@ -50,6 +50,10 @@
 								{
 									"name":"taux de regen +3%","type" : "player"
 								}
+								,
+								{
+									"name":"energie -3%","type" : "player"
+								}
 							]
 							
 						},
@@ -58,8 +62,34 @@
 							"type" : "minor",
 							"nodes":[
 								{"name":"radar plat avant","type" : "player"},
-								{"name":"radar plat arriere","player"}
+								{"name":"radar plat arriere","type":"player"},
+								{"name":"radar 3D","type":"player"},
+								{"name":"portee radar +3%","type":"player"},
+								{"name":"portee detection tout objet","type":"player"}
 							]
+						},
+						{
+						"name":"scan",
+							"type" : "minor",
+							"nodes":[
+								{
+									"name":"cloacking+3% temps","type" : "player"
+								},
+								{
+									"name":"cloacking+3% efficace","type" : "player"
+								},
+								{
+									"name":"brouillage +3%","type" : "player"
+								},
+								{
+									"name":"scan +3% distance","type" : "player"
+								}
+								,
+								{
+									"name":"scan +3% efficace","type" : "player"
+								}
+							]
+							
 						}
 					]
 				}
