@@ -31,8 +31,55 @@
 										{"name":"evitement +3% degat / +3% chance","type" : "player"},
 										{"name":"evitement +3% degat","type" : "player"}
 									]
+								},
+								{
+									"name":"maniabilite",
+									"type" : "minor",
+									"nodes":
+									[
+										{"name":"torque +3% ","type" : "player"},
+										{"name":"torque +3% ","type" : "player"}
+									]
 								}
 							]
+						}
+					]
+				},
+				{
+					"name":"Mecanique",
+					"type" : "intermediate",
+					"nodes":
+					[
+						{
+							"name":"Reparation",
+							"type" : "player",
+							"nodes":[
+								
+										{"name":"hull 10 pts/sec","type" : "player"},
+										{"name":"hull 10 pts/sec","type" : "player"}
+									]
+								
+						},
+						{
+							"name":"Recyclage",
+							"type" : "player",
+							"nodes":[
+								
+										{"name":"+3% recuperation item","type" : "player"},
+										{"name":"+3% recuperation item","type" : "player"}
+									]
+								
+						},
+						
+						{
+							"name":"Amelioration",
+							"type" : "player",
+							"nodes":[
+								
+										{"name":"coque +3% hp","type" : "player"},
+										{"name":"coque +5% hp","type" : "player"}
+									]
+								
 						}
 					]
 				},
@@ -90,6 +137,60 @@
 								}
 							]
 							
+						},
+						{
+						"name":"Energie",
+							"type" : "minor",
+							"nodes":[
+								{
+									"name":"overclocking+5% energie","type" : "player"
+								},
+								{
+									"name":"overclocking+5% energie","type" : "player"
+								},
+								{
+									"name":"overclocking+10% energie","type" : "player"
+								}
+							]
+							
+						}
+					]
+				},
+				{
+					"name":"LeaderShip",
+					"type" : "intermediate",
+					"nodes":[
+						{
+							"name":"Team",
+							"type" : "minor",
+							"nodes":[
+								{
+									"name":"1 equipier","type" : "player"
+								},
+								{
+									"name":"+ 1 equipier","type" : "player"
+								}
+								,
+								{
+									"name":"+ 2 equipiers","type" : "player"
+								}
+							]
+						},
+						{
+							"name":"Order",
+							"type" : "minor",
+							"nodes":[
+								{
+									"name":"Attaque","type" : "player"
+								},
+								{
+									"name":"Defense","type" : "player"
+								}
+								,
+								{
+									"name":"Patrouille","type" : "player"
+								}
+							]
 						}
 					]
 				}
