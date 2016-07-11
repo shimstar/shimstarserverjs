@@ -1,27 +1,67 @@
+'use strict';
 var net = require('net');
 var mysql = require('mysql');
+var fs = require('fs');
+var vm = require('vm');
+
 
 var mySqlClient = mysql.createConnection({
-  host     : "localhost",
+  host     : "127.0.0.1",
   user     : "shimstar",
   password : "shimstar",
   database : "shimstar"
 });
 
-function shimuser(id, name,socket){
-	this.id=id;
-	this.name=name;
-	this.socket=socket;
-}
+var shimWorld = {};
+
+var shimstar = {
+    /**
+     * Startup time.
+     * @private
+     */
+    startTime: process.hrtime(),
+
+    /**
+     * Writes timestamped log to the console.
+     * @public
+     */
+    serverLog: function (txt) {
+        let diff = process.hrtime(this.startTime);
+        let fdiff = diff[0] + diff[1] / 1e9;
+        if (typeof txt !== 'undefined') {
+            console.log(fdiff.toFixed(6) + ' - ' + txt);
+        }
+        return fdiff;
+    },
+};
+
+(function () {
+    const ctx = {
+        shimstar: shimstar,
+        shimWorld: {}
+    };
+
+    vm.createContext(ctx);
+
+    let shimWorldjs = fs.readFileSync('./js/world.js', 'utf8').toString().replace(/^\uFEFF/, '');
+    vm.runInContext(shimWorldjs, ctx, { filename: 'world.js' });
+    ctx.shimWorld = new shimstar.ShimWorld();
+
+    let playerjs = fs.readFileSync('./js/player.js', 'utf8').toString().replace(/^\uFEFF/, '');
+    vm.runInContext(playerjs, ctx, { filename: 'player.js' });
+
+    shimWorld = ctx.shimWorld;
+})();
+
 
 // Keep track of the chat clients
 var clients = [];
 
 // Start a TCP Server
 net.createServer(function (socket) {
-	
+
   // Identify this client
-  socket.name = socket.remoteAddress + ":" + socket.remotePort 
+  socket.name = socket.remoteAddress + ":" + socket.remotePort
 
   // Put this new client in the list
   //~ clients.push(socket);
@@ -34,17 +74,30 @@ net.createServer(function (socket) {
   socket.on('data', function (data) {
     //broadcast(socket.name + "> " + data, socket);
 	  try{
-		var val = JSON.parse(data);
-		if (val.code == "1"){
-			login(socket,val);
-		}
-	  }catch(err){
-			console.log("data received not in JSON format : "  + data  + "/////" + err);
-	  }
+  		var val = JSON.parse(data);
+  		if (val.code == "1"){
+  			login(socket,val);
+  		}
+  	  }catch(err){
+  			console.log("data received not in JSON format : "  + data  + "/////" + err);
+  	  }
   });
 	socket.on('error',function(){
 		console.log('socket reset');
-		 var foundUser = null;
+    var foundUser = null;
+    for (let p in shimWorld.players){
+
+      if(shimWorld.players[p].socket == socket){
+        foundUser = shimWorld.players[p];
+      }
+    };
+
+    if (foundUser){
+      shimstar.serverLog("USer" + foundUser.name + "disconnect");
+      delete shimWorld.players[foundUser.id];
+    }
+
+		/*var foundUser = null;
 		clients.forEach(function (client) {
 
       if (client.socket === socket) {
@@ -56,49 +109,52 @@ net.createServer(function (socket) {
 		clients.splice(clients.indexOf(foundUser), 1);
 		broadcast(foundUser.name + " left the chat.\n");
 	 }
-		//~ clients.splice(clients.indexOf(socket), 1);
+		//~ clients.splice(clients.indexOf(socket), 1);*/
 	});
   // Remove the client from the list when it leaves
   socket.on('end', function () {
-	  var foundUser = null;
-	 console.log(foundUser);
-	 if (foundUser){
-		clients.splice(clients.indexOf(foundUser), 1);
-		broadcast(socket.name + " left the chat.\n");
-	 }
+	   //TODO : is it usefull?
   });
-  
+
   function login(sender,jsonObj){
 	  //~ console.log(jsonObj);
 	  var selectQuery = "SELECT star001_id,star001_name FROM star001_user where star001_name ='" + jsonObj.login + "' and star001_passwd = '" + jsonObj.password +"'";
-	   var status=0;
-	   var tempUser ;
+	  //~ console.log(selectQuery);
+	  var status=0;
+	  var tempUser ;
 		var sqlQuery = mySqlClient.query(selectQuery);
 		sqlQuery.on("result", function(row) {
-			tempUser=new shimuser(row.star001_id,row.star001_name,sender);
+			tempUser=new shimstar.ShimPlayer();
+      tempUser.id = row.star001_id;
+      tempUser.name = row.star001_name;
+      tempUser.socket = sender;
+      //tempUser.dump();
+      shimWorld.players[tempUser.id] = tempUser;
+
 		  status=1;
 		});
-		 
+
 		sqlQuery.on("end", function() {
 			//~ if (status){
 		  //~ mySqlClient.end();
 			//~ }
+			//~ console.log("status" + status);
 			if(status){
 				sender.write('{"code":"1","status":"' + status + '","name":"' + tempUser.name + '","id":"' + tempUser.id + '" }');
 				clients.push(tempUser);
 			}else{
 				sender.write('{"code":"1","status":"' + status + '"}');
 			}
-		  
+
 		});
-		 
+
 		sqlQuery.on("error", function(error) {
 		  console.log(error);
 			sender.write('{"code":"1","status":"-1"}');
 		});
 
   }
-  
+
   // Send a message to all clients
   function broadcast(message, sender) {
     clients.forEach(function (client) {
@@ -113,4 +169,4 @@ net.createServer(function (socket) {
 }).listen(5000);
 
 // Put a friendly message on the terminal of the server.
-console.log("Chat server running at port 5000\n");
+console.log("World server running at port 5000\n");
