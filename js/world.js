@@ -3,4 +3,5 @@
 
 shimstar.ShimWorld = function () {
   this.players = {};
+  this.missionsTemplate = {}
 };

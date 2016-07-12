@@ -49,10 +49,23 @@ var shimstar = {
 
     let playerjs = fs.readFileSync('./js/player.js', 'utf8').toString().replace(/^\uFEFF/, '');
     vm.runInContext(playerjs, ctx, { filename: 'player.js' });
+    let missionjs = fs.readFileSync('./js/mission.js', 'utf8').toString().replace(/^\uFEFF/, '');
+    vm.runInContext(missionjs, ctx, { filename: 'mission.js' });
+    let objectifjs = fs.readFileSync('./js/objectif.js', 'utf8').toString().replace(/^\uFEFF/, '');
+    vm.runInContext(objectifjs, ctx, { filename: 'objectif.js' });
 
     shimWorld = ctx.shimWorld;
 })();
 
+
+(function(){
+    let localMissions = JSON.parse(fs.readFileSync('./data/mission.json', 'utf8').toString().replace(/^\uFEFF/, ''));
+    for (let m in localMissions.missions){
+      let tempMission = new shimstar.ShimMission();
+      tempMission.buildFromJson(localMissions.missions[m]);
+      shimWorld.missionsTemplate[tempMission.id] = tempMission;
+    }
+})();
 
 // Keep track of the chat clients
 var clients = [];
@@ -93,7 +106,7 @@ net.createServer(function (socket) {
     };
 
     if (foundUser){
-      shimstar.serverLog("USer" + foundUser.name + "disconnect");
+      shimstar.serverLog("User " + foundUser.name + " disconnect");
       delete shimWorld.players[foundUser.id];
     }
 
@@ -129,6 +142,8 @@ net.createServer(function (socket) {
       tempUser.name = row.star001_name;
       tempUser.socket = sender;
       //tempUser.dump();
+      let tempMission = new shimstar.ShimMission();
+      tempMission.buildFromJson(shimWorld.missionsTemplate[1]);
       shimWorld.players[tempUser.id] = tempUser;
 
 		  status=1;
