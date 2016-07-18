@@ -15,5 +15,12 @@ shimstar.ShimObjectif.prototype = {
     this.typeObjectif = src.typeObjectif;
     this.custom = src.custom;
   },
-
+  toJson : function(){
+    return{
+      id : this.id,
+      name : this.name,
+      typeObjectif : this.typeObjectif,
+      custom : this.custom
+    };
+  }
 };

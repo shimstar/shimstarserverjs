@@ -110,19 +110,6 @@ net.createServer(function (socket) {
       delete shimWorld.players[foundUser.id];
     }
 
-		/*var foundUser = null;
-		clients.forEach(function (client) {
-
-      if (client.socket === socket) {
-			foundUser = client;
-		};
-
-    });
-	 if (foundUser){
-		clients.splice(clients.indexOf(foundUser), 1);
-		broadcast(foundUser.name + " left the chat.\n");
-	 }
-		//~ clients.splice(clients.indexOf(socket), 1);*/
 	});
   // Remove the client from the list when it leaves
   socket.on('end', function () {
@@ -130,9 +117,7 @@ net.createServer(function (socket) {
   });
 
   function login(sender,jsonObj){
-	  //~ console.log(jsonObj);
 	  var selectQuery = "SELECT star001_id,star001_name FROM star001_user where star001_name ='" + jsonObj.login + "' and star001_passwd = '" + jsonObj.password +"'";
-	  //~ console.log(selectQuery);
 	  var status=0;
 	  var tempUser ;
 		var sqlQuery = mySqlClient.query(selectQuery);
@@ -141,22 +126,24 @@ net.createServer(function (socket) {
       tempUser.id = row.star001_id;
       tempUser.name = row.star001_name;
       tempUser.socket = sender;
-      //tempUser.dump();
       let tempMission = new shimstar.ShimMission();
       tempMission.buildFromJson(shimWorld.missionsTemplate[1]);
+      tempUser.mission = tempMission;
       shimWorld.players[tempUser.id] = tempUser;
 
 		  status=1;
 		});
 
 		sqlQuery.on("end", function() {
-			//~ if (status){
-		  //~ mySqlClient.end();
-			//~ }
-			//~ console.log("status" + status);
 			if(status){
-				sender.write('{"code":"1","status":"' + status + '","name":"' + tempUser.name + '","id":"' + tempUser.id + '" }');
-				clients.push(tempUser);
+        let userJson = tempUser.toJson();
+        let returnJson = {
+          'code' : '1',
+          'status' : status,
+          'userJson' : userJson
+        };
+        let stringToReturn = JSON.stringify(returnJson);
+        sender.write(stringToReturn);
 			}else{
 				sender.write('{"code":"1","status":"' + status + '"}');
 			}

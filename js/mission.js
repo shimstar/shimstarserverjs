@@ -18,6 +18,14 @@ shimstar.ShimMission.prototype = {
     tempObjectif.buildFromJson(src.objectif);
     this.objectif = tempObjectif
   },
-
+  toJson : function(){
+    let tempObjectif = this.objectif.toJson();
+    return{
+      id : this.id,
+      name : this.name,
+      text : this.text,
+      objectif : tempObjectif
+    };
+  }
 
   };
