@@ -42,7 +42,8 @@ var shimstar = {
     };
 
     vm.createContext(ctx);
-
+    let constantsjs = fs.readFileSync('./js/constantes.js', 'utf8').toString().replace(/^\uFEFF/, '');
+    vm.runInContext(constantsjs, ctx, { filename: 'constantes.js' });
     let shimWorldjs = fs.readFileSync('./js/world.js', 'utf8').toString().replace(/^\uFEFF/, '');
     vm.runInContext(shimWorldjs, ctx, { filename: 'world.js' });
     ctx.shimWorld = new shimstar.ShimWorld();
@@ -53,6 +54,7 @@ var shimstar = {
     vm.runInContext(missionjs, ctx, { filename: 'mission.js' });
     let objectifjs = fs.readFileSync('./js/objectif.js', 'utf8').toString().replace(/^\uFEFF/, '');
     vm.runInContext(objectifjs, ctx, { filename: 'objectif.js' });
+
 
     shimWorld = ctx.shimWorld;
 })();
@@ -88,12 +90,15 @@ net.createServer(function (socket) {
     //broadcast(socket.name + "> " + data, socket);
 	  try{
   		var val = JSON.parse(data);
-  		if (val.code == "1"){
+  		if (val.code == shimstar.C.C_MESSAGE_LOGIN){
   			login(socket,val);
   		}
-  	  }catch(err){
-  			console.log("data received not in JSON format : "  + data  + "/////" + err);
-  	  }
+      else if(val.code == shimstar.C.C_MESSAGE_UPDATE_MISSION){
+
+      }
+	  }catch(err){
+			console.log("data received not in JSON format : "  + data  + "/////" + err);
+	  }
   });
 	socket.on('error',function(){
 		console.log('socket reset');
