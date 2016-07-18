@@ -5,7 +5,7 @@ shimstar.ShimPlayer = function () {
    this.id=0;
    this.name="";
    this.socket = null;
-   this.mission = null;
+   this.missions = {};
 };
 
 shimstar.ShimPlayer.prototype = {
@@ -13,13 +13,22 @@ shimstar.ShimPlayer.prototype = {
     shimstar.serverLog("id = " + this.id + "/" + "name" + this.name + "/socket=" + this.socket);
   },
   toJson : function(){
-    let tempMission = null;
-    if (this.mission) tempMission = this.mission.toJson();
+    let tempMissions = {};
+    for (let itMission in this.missions){
+      tempMissions.push(this.missions[itMission].toJson());
+    }
+    //if (this.mission) tempMission = this.mission.toJson();
+
     return{
       id : this.id,
       name : this.name,
-      mission : tempMission
+      missions : tempMissions
     };
+  }
+
+  proposeMission : function(idMission){
+
+
   }
 
 };

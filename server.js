@@ -72,6 +72,17 @@ var shimstar = {
 // Keep track of the chat clients
 var clients = [];
 
+function searchUser(idUser){
+  var foundUser = null;
+  for (let p in shimWorld.players){
+    if(shimWorld.players[p].id == idUser){
+      foundUser = shimWorld.players[p];
+    }
+  };
+  return foundUser;
+}
+
+
 // Start a TCP Server
 net.createServer(function (socket) {
 
@@ -93,7 +104,7 @@ net.createServer(function (socket) {
   		if (val.code == shimstar.C.C_MESSAGE_LOGIN){
   			login(socket,val);
   		}
-      else if(val.code == shimstar.C.C_MESSAGE_UPDATE_MISSION){
+      else if(val.code == shimstar.C.C_MESSAGE_PROPOSE_MISSION){
 
       }
 	  }catch(err){
