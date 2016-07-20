@@ -105,7 +105,10 @@ net.createServer(function (socket) {
   			login(socket,val);
   		}
       else if(val.code == shimstar.C.C_MESSAGE_PROPOSE_MISSION){
+        let userToFind = searchUser(val.id);
+        if (userToFind != null){
 
+        }
       }
 	  }catch(err){
 			console.log("data received not in JSON format : "  + data  + "/////" + err);

@@ -14,17 +14,17 @@ shimstar.ShimPlayer.prototype = {
   },
   toJson : function(){
     let tempMissions = {};
+    let toReturn = {};
     for (let itMission in this.missions){
       tempMissions.push(this.missions[itMission].toJson());
     }
-    //if (this.mission) tempMission = this.mission.toJson();
-
-    return{
-      id : this.id,
-      name : this.name,
-      missions : tempMissions
-    };
-  }
+    toReturn.id = this.id;
+    toReturn.name = this.name;
+    if(tempMissions.length > 0){
+      toReturn.missions = tempMissions;
+    }
+    return toReturn;
+  },
 
   proposeMission : function(idMission){
 
