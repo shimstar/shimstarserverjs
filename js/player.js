@@ -5,7 +5,7 @@ shimstar.ShimPlayer = function () {
    this.id=0;
    this.name="";
    this.socket = null;
-   this.missions = {};
+   this.missions = [];
 };
 
 shimstar.ShimPlayer.prototype = {
@@ -26,9 +26,18 @@ shimstar.ShimPlayer.prototype = {
     return toReturn;
   },
 
-  proposeMission : function(idMission){
-
-
+  acceptMission : function(idMission){
+    let isNew = true;
+    if (this.missions){
+      for (let i = 0 ; i < this.missions.length ; i++){
+          if(idMission == this.missions[i].id) isNew = false;
+      }
+    }
+    if(isNew){
+      if (this.missions == undefined) this.missions = [];
+      let tempMission = new shimstar.ShimMission();
+      tempMission.buildFromJson(shimWorld.missionsTemplate[idMission]);
+      this.missions.push(tempMission);
+    }
   }
-
 };

@@ -82,6 +82,16 @@ function searchUser(idUser){
   return foundUser;
 }
 
+function searchUserFromSocket(socket){
+  var foundUser = null;
+  for (let p in shimWorld.players){
+    if(shimWorld.players[p].socket == socket){
+      foundUser = shimWorld.players[p];
+    }
+  };
+  return foundUser;
+}
+
 
 // Start a TCP Server
 net.createServer(function (socket) {
@@ -104,10 +114,13 @@ net.createServer(function (socket) {
   		if (val.code == shimstar.C.C_MESSAGE_LOGIN){
   			login(socket,val);
   		}
-      else if(val.code == shimstar.C.C_MESSAGE_PROPOSE_MISSION){
-        let userToFind = searchUser(val.id);
+      else if(val.code == shimstar.C.C_MESSAGE_ACCEPT_MISSION){
+        let userToFind = searchUserFromSocket(socket);
         if (userToFind != null){
-
+          userToFind.acceptMission(val.idmission);
+          console.log("%o",userToFind.missions);
+        }else{
+          console.log("Accept mission user not found");
         }
       }
 	  }catch(err){
@@ -145,9 +158,9 @@ net.createServer(function (socket) {
       tempUser.id = row.star001_id;
       tempUser.name = row.star001_name;
       tempUser.socket = sender;
-      let tempMission = new shimstar.ShimMission();
+      /*let tempMission = new shimstar.ShimMission();
       tempMission.buildFromJson(shimWorld.missionsTemplate[1]);
-      tempUser.mission = tempMission;
+      tempUser.mission = tempMission;*/
       shimWorld.players[tempUser.id] = tempUser;
 
 		  status=1;
