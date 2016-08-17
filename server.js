@@ -1,16 +1,15 @@
 'use strict';
 var net = require('net');
-var mysql = require('mysql');
 var fs = require('fs');
 var vm = require('vm');
+var mongoose = require('mongoose');
+require('./js/models/missions.js');
+require('./js/models/users.js');
 
+mongoose.connect('mongodb://127.0.0.1/shimstar');
+var Mission = mongoose.model('Mission');
+var User = mongoose.model('User');
 
-var mySqlClient = mysql.createConnection({
-  host     : "127.0.0.1",
-  user     : "shimstar",
-  password : "shimstar",
-  database : "shimstar"
-});
 
 var shimWorld = {};
 
@@ -149,44 +148,25 @@ net.createServer(function (socket) {
   });
 
   function login(sender,jsonObj){
-	  var selectQuery = "SELECT star001_id,star001_name FROM star001_user where star001_name ='" + jsonObj.login + "' and star001_passwd = '" + jsonObj.password +"'";
-	  var status=0;
-	  var tempUser ;
-		var sqlQuery = mySqlClient.query(selectQuery);
-		sqlQuery.on("result", function(row) {
-			tempUser=new shimstar.ShimPlayer();
-      tempUser.id = row.star001_id;
-      tempUser.name = row.star001_name;
-      tempUser.socket = sender;
-      /*let tempMission = new shimstar.ShimMission();
-      tempMission.buildFromJson(shimWorld.missionsTemplate[1]);
-      tempUser.mission = tempMission;*/
-      shimWorld.players[tempUser.id] = tempUser;
-
-		  status=1;
-		});
-
-		sqlQuery.on("end", function() {
-			if(status){
-        let userJson = tempUser.toJson();
-        let returnJson = {
-          'code' : '1',
-          'status' : status,
-          'userJson' : userJson
-        };
-        let stringToReturn = JSON.stringify(returnJson);
-        sender.write(stringToReturn);
+    User.find({'name':jsonObj.login,'password':jsonObj.password},function(err,result){
+      if(err){ return next(err); }
+      if(result.length>0){
+          var tempUser=new shimstar.ShimPlayer();
+          tempUser.id = String(result[0]._id);
+          tempUser.name = result[0].name;
+          tempUser.socket = sender;
+          let userJson = tempUser.toJson();
+          let returnJson = {
+            'code' : '1',
+            'status' : 1
+            ,'userJson' : userJson
+          };
+          let stringToReturn = JSON.stringify(returnJson);
+          sender.write(stringToReturn);
 			}else{
-				sender.write('{"code":"1","status":"' + status + '"}');
+				sender.write('{"code":"1","status":"-1"}');
 			}
-
-		});
-
-		sqlQuery.on("error", function(error) {
-		  console.log(error);
-			sender.write('{"code":"1","status":"-1"}');
-		});
-
+    });
   }
 
   // Send a message to all clients

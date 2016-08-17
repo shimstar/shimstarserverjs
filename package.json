@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "name": "ShimstarServer",
+  "description": "Shimstar World Server",
+  "dependencies": {
+    "mongoose": "^4.5.5"
+  }
+
+}
