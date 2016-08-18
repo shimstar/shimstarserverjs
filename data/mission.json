@@ -1,7 +1,7 @@
 {
 	"missions":[
 		{
-			"id" : 1,
+			"idtemplate" : 1,
 			"name":"Destroy Petit Pirate",
 			"type" : "destroy",
 			"location" : "zone1",
@@ -24,7 +24,7 @@
 			}
 		},
 		{
-			"id" : 2,
+			"idtemplate" : 2,
 			"name":"Destroy 2 Pirates",
 			"location" : "zone1",
 			"type" : "destroy",

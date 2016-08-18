@@ -32,6 +32,10 @@ var shimstar = {
         }
         return fdiff;
     },
+
+    objectLog : function(obj){
+      console.log("%o",obj);
+    }
 };
 
 (function () {
@@ -64,7 +68,7 @@ var shimstar = {
     for (let m in localMissions.missions){
       let tempMission = new shimstar.ShimMission();
       tempMission.buildFromJson(localMissions.missions[m]);
-      shimWorld.missionsTemplate[tempMission.id] = tempMission;
+      shimWorld.missionsTemplate[tempMission.idtemplate] = tempMission;
     }
 })();
 
@@ -74,9 +78,7 @@ var clients = [];
 function searchUser(idUser){
   var foundUser = null;
   for (let p in shimWorld.players){
-    if(shimWorld.players[p].id == idUser){
-      foundUser = shimWorld.players[p];
-    }
+    if (shimWorld.players[p].id === idUser) foundUser = shimWorld.players[p];
   };
   return foundUser;
 }
@@ -110,21 +112,43 @@ net.createServer(function (socket) {
     //broadcast(socket.name + "> " + data, socket);
 	  try{
   		var val = JSON.parse(data);
-  		if (val.code == shimstar.C.C_MESSAGE_LOGIN){
+      }catch(err){
+        console.log("data received not in JSON format : "  + data  + "/////" + err);
+        val = null;
+      }
+  		if (val && val.code == shimstar.C.C_MESSAGE_LOGIN){
+
   			login(socket,val);
-  		}
+        }
       else if(val.code == shimstar.C.C_MESSAGE_ACCEPT_MISSION){
-        let userToFind = searchUserFromSocket(socket);
+        let userToFind = searchUser(val.idplayer);
+
         if (userToFind != null){
-          userToFind.acceptMission(val.idmission);
-          console.log("%o",userToFind.missions);
+          let newMission = userToFind.acceptMission(val.idmission);
+          //TODO : check newMission
+          if (newMission && newMission.idtemplate !== undefined){
+            var newMissionMongo = new Mission({idtemplate : newMission.idtemplate,status : newMission.status});
+
+            newMissionMongo.save(function(err,result){
+              if(err){ return next(err); }
+              User.findById(userToFind.id).exec(function(err,resultUser){
+                var tempR = resultUser.toObject();
+                if(err){ return next(err); }
+                if(!tempR.missions || tempR.missions === undefined) tempR.missions = [];
+                tempR.missions.push(newMissionMongo._id);
+                User.update({_id : tempR._id},{missions : tempR.missions},function(err,resultUpdated){
+                  if(err){ return next(err); }
+                });
+              });
+            });
+          }else{
+                console.log("Mission existing already or problem occurs");
+          }
         }else{
           console.log("Accept mission user not found");
         }
       }
-	  }catch(err){
-			console.log("data received not in JSON format : "  + data  + "/////" + err);
-	  }
+
   });
 	socket.on('error',function(){
 		console.log('socket reset');
@@ -148,13 +172,14 @@ net.createServer(function (socket) {
   });
 
   function login(sender,jsonObj){
-    User.find({'name':jsonObj.login,'password':jsonObj.password},function(err,result){
+    User.find({'name':jsonObj.login,'password':jsonObj.password}).populate({path : "missions"}).exec(function(err,result){
       if(err){ return next(err); }
       if(result.length>0){
           var tempUser=new shimstar.ShimPlayer();
           tempUser.id = String(result[0]._id);
           tempUser.name = result[0].name;
           tempUser.socket = sender;
+          tempUser.loadMissions(shimWorld.missionsTemplate,result[0].missions);
           let userJson = tempUser.toJson();
           let returnJson = {
             'code' : '1',
@@ -162,6 +187,8 @@ net.createServer(function (socket) {
             ,'userJson' : userJson
           };
           let stringToReturn = JSON.stringify(returnJson);
+          if (shimWorld.players === undefined || !shimWorld.players) shimWorld.players = {};
+          shimWorld.players[tempUser.id] = tempUser;
           sender.write(stringToReturn);
 			}else{
 				sender.write('{"code":"1","status":"-1"}');

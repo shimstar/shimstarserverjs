@@ -6,10 +6,11 @@ shimstar.ShimObjectif = function () {
    this.name="";
    this.typeObjectif = 0;
    this.custom = {};
+   this.status = 0;
 };
 
 shimstar.ShimObjectif.prototype = {
-  buildFromJson : function(src){
+  buildFromJson : function(src){  
     this.id = src.id;
     this.name = src.name;
     this.typeObjectif = src.typeObjectif;
@@ -21,6 +22,12 @@ shimstar.ShimObjectif.prototype = {
       name : this.name,
       typeObjectif : this.typeObjectif,
       custom : this.custom
+    };
+  },
+
+  toMongo : function(){
+    return{
+      status : this.status
     };
   }
 };

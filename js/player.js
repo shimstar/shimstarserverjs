@@ -13,7 +13,7 @@ shimstar.ShimPlayer.prototype = {
     shimstar.serverLog("id = " + this.id + "/" + "name" + this.name + "/socket=" + this.socket);
   },
   toJson : function(){
-    let tempMissions = {};
+    let tempMissions = [];
     let toReturn = {};
     for (let itMission in this.missions){
       tempMissions.push(this.missions[itMission].toJson());
@@ -26,18 +26,32 @@ shimstar.ShimPlayer.prototype = {
     return toReturn;
   },
 
+  loadMissions : function(missionsTemplate,jsonMissions){
+    if(jsonMissions && jsonMissions !== undefined){
+      for(let i=0;i<jsonMissions.length;i++){
+        let tempMission = new shimstar.ShimMission();
+        tempMission.buildFromJson(shimWorld.missionsTemplate[jsonMissions[i].idtemplate]);
+        tempMission.status = jsonMissions[i].status;
+        this.missions.push(tempMission);
+      }
+    }
+  },
+
   acceptMission : function(idMission){
     let isNew = true;
-    if (this.missions){
+    if (this.missions && this.missions !== undefined){
       for (let i = 0 ; i < this.missions.length ; i++){
-          if(idMission == this.missions[i].id) isNew = false;
+          if(idMission == this.missions[i].idtemplate) isNew = false;
       }
     }
     if(isNew){
       if (this.missions == undefined) this.missions = [];
       let tempMission = new shimstar.ShimMission();
       tempMission.buildFromJson(shimWorld.missionsTemplate[idMission]);
+      tempMission.status = shimstar.C.C_MISSION_STATUS_ACCEPTED;
       this.missions.push(tempMission);
+      return tempMission.toMongo();
     }
+    return null;
   }
 };
