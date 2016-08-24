@@ -31,6 +31,7 @@ shimstar.ShimPlayer.prototype = {
       for(let i=0;i<jsonMissions.length;i++){
         let tempMission = new shimstar.ShimMission();
         tempMission.buildFromJson(shimWorld.missionsTemplate[jsonMissions[i].idtemplate]);
+        tempMission.id = jsonMissions[i]._id;
         tempMission.status = jsonMissions[i].status;
         this.missions.push(tempMission);
       }

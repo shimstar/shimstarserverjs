@@ -33,9 +33,10 @@ shimstar.ShimMission.prototype = {
     };
     return{
       idtemplate : this.idtemplate,
-      name : this.name,
-      text : this.text,
-      objectif : tempObjectif
+      id : this.id,
+      objectif : tempObjectif,
+      status : this.status
+
     };
   },
 

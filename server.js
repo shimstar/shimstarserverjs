@@ -117,7 +117,6 @@ net.createServer(function (socket) {
         val = null;
       }
   		if (val && val.code == shimstar.C.C_MESSAGE_LOGIN){
-
   			login(socket,val);
         }
       else if(val.code == shimstar.C.C_MESSAGE_ACCEPT_MISSION){
@@ -125,7 +124,6 @@ net.createServer(function (socket) {
 
         if (userToFind != null){
           let newMission = userToFind.acceptMission(val.idmission);
-          //TODO : check newMission
           if (newMission && newMission.idtemplate !== undefined){
             var newMissionMongo = new Mission({idtemplate : newMission.idtemplate,status : newMission.status});
 
@@ -138,6 +136,8 @@ net.createServer(function (socket) {
                 tempR.missions.push(newMissionMongo._id);
                 User.update({_id : tempR._id},{missions : tempR.missions},function(err,resultUpdated){
                   if(err){ return next(err); }
+                  let toReturn = {code: shimstar.C.C_MESSAGE_ACCEPT_MISSION ,idtemplate : newMission.idtemplate, status : newMission.status};
+                  socket.write(JSON.stringify(toReturn));
                 });
               });
             });
@@ -189,6 +189,7 @@ net.createServer(function (socket) {
           let stringToReturn = JSON.stringify(returnJson);
           if (shimWorld.players === undefined || !shimWorld.players) shimWorld.players = {};
           shimWorld.players[tempUser.id] = tempUser;
+          console.log(stringToReturn);
           sender.write(stringToReturn);
 			}else{
 				sender.write('{"code":"1","status":"-1"}');
