@@ -116,9 +116,24 @@ net.createServer(function (socket) {
         console.log("data received not in JSON format : "  + data  + "/////" + err);
         val = null;
       }
+      console.log(val);
   		if (val && val.code == shimstar.C.C_MESSAGE_LOGIN){
   			login(socket,val);
+      }
+      else if (val && val.code == shimstar.C.C_MESSAGE_INFO_USER){
+    		let userToFind = searchUser(val.id);
+        if (userToFind != null){
+          let userJson = userToFind.toJson();
+          let returnJson = {
+            'code' :shimstar.C.C_MESSAGE_INFO_USER,
+            'status' : 1
+            ,'userJson' : userJson
+          };
+          let stringToReturn = JSON.stringify(returnJson);
+          console.log(stringToReturn);
+          socket.write(stringToReturn);
         }
+      }
       else if(val.code == shimstar.C.C_MESSAGE_ACCEPT_MISSION){
         let userToFind = searchUser(val.idplayer);
 
