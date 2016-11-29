@@ -20,6 +20,17 @@
 				"typeObjectif" : 1,
 				"custom" : {
 					"nbShip":"1"
+				},
+				"event":{
+					"id":"1_1_1",
+					"typeevt":"spawn",
+					"location":{
+						"x":2000,
+						"y":2500,
+						"z":2500
+					},
+					"typeship":"darkfighterai",
+					"nb":1
 				}
 			}
 		},

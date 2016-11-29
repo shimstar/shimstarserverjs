@@ -8,6 +8,7 @@ shimstar.C = Object.freeze({
     C_MESSAGE_PROPOSE_MISSION : "4",
     C_MESSAGE_CREATE_USER : "5",
     C_MESSAGE_INFO_USER : "6",
+    C_MESSAGE_CREATE_USER : "7",
 
     C_MISSION_STATUS_NEW : "1",
     C_MISSION_STATUS_ACCEPTED : "2",

@@ -5,6 +5,7 @@ shimstar.ShimPlayer = function () {
    this.id=0;
    this.name="";
    this.socket = null;
+   this.password = "";
    this.missions = [];
 };
 

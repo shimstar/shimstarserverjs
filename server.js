@@ -133,8 +133,28 @@ net.createServer(function (socket) {
           console.log(stringToReturn);
           socket.write(stringToReturn);
         }
-      }
-      else if(val.code == shimstar.C.C_MESSAGE_ACCEPT_MISSION){
+
+      }else if(val.code == shimstar.C.C_MESSAGE_CREATE_USER){
+        //TODO check if user already exists
+        var tempUser=new shimstar.ShimPlayer();
+        tempUser.name = val.name;
+        tempUser.socket = socket;
+        tempUser.password = val.password;
+        let tempBbbUser = new User({name : tempUser.name,password : tempUser.password});
+        tempBbbUser.save(function(err,res){
+          tempUser.i = tempBbbUser._id;
+          let userJson = tempUser.toJson();
+          let returnJson = {
+            'code' :shimstar.C.C_MESSAGE_CREATE_USER,
+            'status' : 1
+            ,'userJson' : userJson
+          };
+          let stringToReturn = JSON.stringify(returnJson);
+          console.log(stringToReturn);
+          socket.write(stringToReturn);
+        });
+
+      }else if(val.code == shimstar.C.C_MESSAGE_ACCEPT_MISSION){
         let userToFind = searchUser(val.idplayer);
 
         if (userToFind != null){
